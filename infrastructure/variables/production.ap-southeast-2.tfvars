@@ -4,6 +4,9 @@ region="ap-southeast-2"
 alb_name="expensely"
 alb_default_certificate_domain="*.expensely.com.au"
 
+code_deploy_role_name="expensely-code-deploy"
+code_deploy_bucket_name="expensely-code-deploy-production"
+
 vpc_name="expensely"
 vpc_cidr="10.12.128.0/17"
 vpc_azs=["ap-southeast-2a", "ap-southeast-2b", "ap-southeast-2c"]

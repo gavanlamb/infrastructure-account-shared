@@ -16,6 +16,15 @@ variable "alb_default_certificate_domain" {
   description = "Domain name that has a certificate. The found cert will be the default for the load balancer."
 }
 
+variable "code_deploy_role_name" {
+  type = string
+  description = "Name of the role for CodeDeploy"
+}
+variable "code_deploy_bucket_name" {
+  type = string
+  description = "Bucket name for CodeDeploy artifacts."
+}
+
 variable "vpc_name" {
   description = "The name of the VPC for the given environment and region."
   type        = string
