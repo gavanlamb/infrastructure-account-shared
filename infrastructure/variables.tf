@@ -42,6 +42,11 @@ variable "code_deploy_bucket_name" {
   description = "Bucket name for CodeDeploy artifacts."
 }
 
+variable "postgres_name" {
+  type = string
+  description = "Name of the postgres instance"
+}
+
 variable "vpc_name" {
   description = "The name of the VPC for the given environment and region."
   type        = string

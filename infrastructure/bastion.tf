@@ -19,6 +19,7 @@ module "bastion" {
   region = var.region
   vpc_id = module.vpc.vpc_id
   tags = local.default_tags
+  bastion_additional_security_groups = [aws_security_group.postgres_client.id, aws_security_group.external.id]
 }
 
 resource "aws_s3_bucket_public_access_block" "bastion" {
