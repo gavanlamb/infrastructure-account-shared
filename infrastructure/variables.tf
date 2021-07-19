@@ -16,6 +16,31 @@ variable "alb_default_certificate_domain" {
   description = "Domain name that has a certificate. The found cert will be the default for the load balancer."
 }
 
+variable "vpc_name" {
+  description = "The name of the VPC for the given environment and region."
+  type        = string
+}
+variable "vpc_cidr" {
+  description = "The VPC-level CIDR block for a given VPC."
+  type        = string
+}
+variable "vpc_azs" {
+  description = "The Availability Zones to activate for a given VPC."
+  type        = list(string)
+}
+variable "vpc_public_subnets" {
+  description = "The subnet-level CIDR block for a given public subnet."
+  type        = list(string)
+}
+variable "vpc_application_subnets" {
+  description = "The subnet-level CIDR block for a given private/application subnet."
+  type        = list(string)
+}
+variable "vpc_database_subnets" {
+  description = "The subnet-level CIDR block for a given database subnet."
+  type        = list(string)
+}
+
 locals {
   default_tags = {
     Application = "Expensely"
