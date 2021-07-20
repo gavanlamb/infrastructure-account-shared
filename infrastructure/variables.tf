@@ -33,6 +33,19 @@ variable "bastion_public_key" {
   description = "Public key for the bastion host."
 }
 
+variable "cluster_name" {
+  type = string
+  description = "Name of the ECS cluster"
+}
+variable "cluster_instance_type" {
+  type = string
+  description = "Name of the ECS cluster"
+}
+variable "cluster_instance_public_key" {
+  type = string
+  description = "Name of the ECS cluster"
+}
+
 variable "code_deploy_role_name" {
   type = string
   description = "Name of the role for CodeDeploy"
