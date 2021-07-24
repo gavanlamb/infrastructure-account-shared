@@ -2,7 +2,6 @@
 region="ap-southeast-2"
 
 alb_name="expensely"
-alb_default_certificate_domain="*.expensely.com.au"
 
 bastion_name="expensely-bastion"
 bastion_bucket_name="expensely-bastion-production"
@@ -15,6 +14,8 @@ cluster_instance_public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuTD8qcTvusT9
 
 code_deploy_role_name="expensely-code-deploy"
 code_deploy_bucket_name="expensely-code-deploy-production"
+
+expensely_io_name="expensely.io"
 
 postgres_name="expensely"
 

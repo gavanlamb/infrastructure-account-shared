@@ -64,7 +64,7 @@ resource "aws_alb_listener" "https" {
   protocol = "HTTPS"
 
   ssl_policy = "ELBSecurityPolicy-2016-08"
-  certificate_arn = data.aws_acm_certificate.certificate.arn
+  certificate_arn = aws_acm_certificate.expensely_io_wildcard.arn
 
   default_action {
     type = "fixed-response"
@@ -75,8 +75,4 @@ resource "aws_alb_listener" "https" {
       status_code = "200"
     }
   }
-}
-data "aws_acm_certificate" "certificate" {
-  domain   = var.alb_default_certificate_domain
-  statuses = ["ISSUED"]
 }
