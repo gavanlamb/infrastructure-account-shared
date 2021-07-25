@@ -2,7 +2,7 @@
 region="ap-southeast-2"
 
 alb_name="expensely"
-alb_default_certificate_domain="*.expensely.com.au"
+alb_default_certificate_domain="*.expensely.io"
 
 bastion_name="expensely-bastion"
 bastion_bucket_name="expensely-bastion-production"
