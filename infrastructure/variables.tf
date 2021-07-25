@@ -11,6 +11,10 @@ variable "alb_name" {
   type = string
   description = "Name of the application load balancer"
 }
+variable "alb_default_certificate_domain" {
+  description = "Name of the certifcate to use as dault for ALB"
+  type = string
+}
 
 variable "bastion_name" {
   type = string
@@ -58,40 +62,30 @@ variable "postgres_name" {
 
 variable "vpc_name" {
   description = "The name of the VPC for the given environment and region."
-  type        = string
+  type = string
 }
 variable "vpc_cidr" {
   description = "The VPC-level CIDR block for a given VPC."
-  type        = string
+  type = string
 }
 variable "vpc_azs" {
   description = "The Availability Zones to activate for a given VPC."
-  type        = list(string)
+  type = list(string)
 }
 variable "vpc_public_subnets" {
   description = "The subnet-level CIDR block for a given public subnet."
-  type        = list(string)
+  type = list(string)
 }
 variable "vpc_application_subnets" {
   description = "The subnet-level CIDR block for a given private/application subnet."
-  type        = list(string)
+  type = list(string)
 }
 variable "vpc_database_subnets" {
   description = "The subnet-level CIDR block for a given database subnet."
-  type        = list(string)
-}
-
-variable "expensely_io_name" {
-  type = string
-}
-variable "expensely_io_records" {
-  type = list(any)
-  default = null
+  type = list(string)
 }
 
 locals {
-  create_expensely_io_route53_records = var.expensely_io_records != null ? true : false
-
   default_tags = {
     Application = "Expensely"
     Team = "Expensely"
