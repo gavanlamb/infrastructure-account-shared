@@ -126,7 +126,7 @@ resource "aws_autoscaling_group" "linux" {
     },
     {
       key = "Team"
-      value = "ClaimLogik"
+      value = "Expensely"
       propagate_at_launch = true
     },
     {
