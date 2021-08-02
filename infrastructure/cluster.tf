@@ -41,7 +41,12 @@ resource "aws_launch_template" "linux" {
   disable_api_termination = false
   user_data = base64encode(data.template_file.linux_startup.rendered)
   key_name = aws_key_pair.linux.key_name
-
+  
+  vpc_security_group_ids = [
+    aws_security_group.ephemeral_ports.id,
+    aws_security_group.postgres_client.id,
+    aws_security_group.external.id]
+  
   iam_instance_profile {
     arn = aws_iam_instance_profile.linux.arn
   }
@@ -197,4 +202,35 @@ resource "aws_placement_group" "default" {
 resource "aws_key_pair" "linux" {
   public_key = var.cluster_instance_public_key
   key_name = var.cluster_name
+}
+
+resource "aws_security_group" "ephemeral_ports" {
+  name = "expensely-ephemeral-ports"
+  description = "Allow ephemeral port range"
+  vpc_id = module.vpc.vpc_id
+
+  ingress {
+    description = "Ephemeral port range"
+    from_port = 49153
+    to_port = 65535
+    protocol = "tcp"
+
+    security_groups = [
+      aws_security_group.alb.id]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = [
+      "0.0.0.0/0"]
+  }
+
+  tags = merge(
+  local.default_tags,
+  {
+    Name = "expensely-ephemeral-ports"
+  }
+  )
 }
