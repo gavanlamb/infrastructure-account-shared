@@ -5,7 +5,8 @@ resource "aws_lb" "alb" {
 
   subnets = module.vpc.public_subnets
   security_groups = [
-    aws_security_group.alb.id]
+    aws_security_group.alb.id,
+    aws_security_group.external.id]
 
   enable_deletion_protection = true
 

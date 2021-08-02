@@ -24,7 +24,7 @@ resource "aws_ecs_capacity_provider" "linux" {
     managed_termination_protection = "ENABLED"
     managed_scaling {
       status = "ENABLED"
-      target_capacity = 2
+      target_capacity = 90
       maximum_scaling_step_size = 10
       minimum_scaling_step_size = 1
     }
@@ -79,7 +79,7 @@ resource "aws_autoscaling_group" "linux" {
   min_size = 2
   max_size = 10
   desired_capacity = 2
-  default_cooldown = 300
+  default_cooldown = 100
 
   launch_template {
     name = aws_launch_template.linux.name
