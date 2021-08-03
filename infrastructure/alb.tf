@@ -82,3 +82,39 @@ data "aws_acm_certificate" "alb_default" {
   domain   = var.alb_default_certificate_domain
   statuses = ["ISSUED"]
 }
+
+data "aws_acm_certificate" "wildcard_expensely_com_au" {
+  domain   = var.alb_expensely_com_au_certificate_domain
+  statuses = ["ISSUED"]
+}
+resource "aws_lb_listener_certificate" "wildcard_expensely_com_au" {
+  listener_arn = aws_alb_listener.https.arn
+  certificate_arn = data.aws_acm_certificate.wildcard_expensely_com_au.arn
+}
+
+data "aws_acm_certificate" "wildcard_expensely_app" {
+  domain   = var.alb_expensely_app_certificate_domain
+  statuses = ["ISSUED"]
+}
+resource "aws_lb_listener_certificate" "wildcard_expensely_app" {
+  listener_arn = aws_alb_listener.https.arn
+  certificate_arn = data.aws_acm_certificate.wildcard_expensely_app.arn
+}
+
+data "aws_acm_certificate" "wildcard_expensely_co" {
+  domain   = var.alb_expensely_co_certificate_domain
+  statuses = ["ISSUED"]
+}
+resource "aws_lb_listener_certificate" "wildcard_expensely_co" {
+  listener_arn = aws_alb_listener.https.arn
+  certificate_arn = data.aws_acm_certificate.wildcard_expensely_co.arn
+}
+
+data "aws_acm_certificate" "wildcard_expensely_me" {
+  domain   = var.alb_expensely_me_certificate_domain
+  statuses = ["ISSUED"]
+}
+resource "aws_lb_listener_certificate" "wildcard_expensely_me" {
+  listener_arn = aws_alb_listener.https.arn
+  certificate_arn = data.aws_acm_certificate.wildcard_expensely_me.arn
+}
