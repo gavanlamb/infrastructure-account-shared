@@ -11,25 +11,9 @@ variable "alb_name" {
   type = string
   description = "Name of the application load balancer"
 }
-variable "alb_default_certificate_domain" {
-  description = "Name of the certificate to use as default for ALB"
-  type = string
-}
-variable "alb_expensely_com_au_certificate_domain" {
-  description = "Name of the expensely.com.au certificate to use for the ALB"
-  type = string
-}
-variable "alb_expensely_app_certificate_domain" {
-  description = "Name of the expensely.app certificate to use for the ALB"
-  type = string
-}
-variable "alb_expensely_co_certificate_domain" {
-  description = "Name of the expensely.co certificate to use for the ALB"
-  type = string
-}
-variable "alb_expensely_me_certificate_domain" {
-  description = "Name of the expensely.me certificate to use for the ALB"
-  type = string
+variable "alb_certificates" {
+  type = list(string)
+  description = "Name certificates to add to the ALB"
 }
 
 variable "bastion_name" {

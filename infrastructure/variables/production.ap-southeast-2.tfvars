@@ -2,11 +2,18 @@
 region="ap-southeast-2"
 
 alb_name="expensely"
-alb_default_certificate_domain="expensely.io"
-alb_expensely_com_au_certificate_domain="expensely.com.au"
-alb_expensely_app_certificate_domain="expensely.app"
-alb_expensely_co_certificate_domain="expensely.co"
-alb_expensely_me_certificate_domain="expensely.me"
+alb_certificates=[
+  "expensely.io",
+  "expensely.com.au",
+  "expensely.app",
+  "expensely.co",
+  "expensely.me",
+  "preview.expensely.io",
+  "preview.expensely.com.au",
+  "preview.expensely.app",
+  "preview.expensely.co",
+  "preview.expensely.me"
+]
 
 bastion_name="expensely-bastion"
 bastion_bucket_name="expensely-bastion-production"
