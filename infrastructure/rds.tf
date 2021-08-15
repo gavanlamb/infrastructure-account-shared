@@ -128,7 +128,7 @@ resource "aws_security_group_rule" "postgres_client" {
   description = "Allow traffic to ${aws_security_group.postgres_server.name} on port ${module.postgres.db_instance_port}"
 }
 
-resource "aws_ssm_document" "delete_database" {
+resource "aws_ssm_document" "create_database" {
   name = "CreateDatabase-${var.postgres_name}"
   document_type = "Command"
 
@@ -179,5 +179,53 @@ mainSteps:
       $ConnectionString="Host=$Host;Port=$Port;Database={{ databaseName }};Username={{ username }};Password=$UserPassword"
 
       aws ssm put-parameter --name "{{ connectionStringParameterStoreName }}" --value "$ConnectionString" --type "SecureString"
+DOC
+}
+
+resource "aws_ssm_document" "delete_database" {
+  name = "DeleteDatabase-${var.postgres_name}"
+  document_type = "Command"
+
+  document_format = "YAML"
+
+  tags = local.default_tags
+
+  content = <<DOC
+---
+schemaVersion: '2.2'
+description: aws:runPowerShellScript
+parameters:
+  databaseName:
+    type: String
+    description: "(Required) Database name."
+    allowedPattern: "^([A-Z][a-zA-Z]+)+$"
+  username:
+    type: String
+    description: "(Required) Name of user"
+    allowedPattern: "^([A-Z][a-zA-Z0-9]+)+$"
+  connectionStringParameterStoreName:
+    type: String
+    description: "(Required) Name of the connection string in parameter store"
+    allowedPattern: "^([A-Z][a-zA-Z]+)+$"
+mainSteps:
+- action: aws:runPowerShellScript
+  name: runPowerShellScript
+  inputs:
+    timeoutSeconds: '300'
+    runCommand:
+    - |
+      Username=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Username')
+      Password=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Password')
+      Host=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Endpoint')
+      Port=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Port')
+
+      DatabaseConnectionString="postgresql://$Username:$Password@$Host:$Port/"
+
+      psql $DatabaseConnectionString -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = '{{ databaseName }}'" | grep -q 0 | exit 0
+
+      psql $DatabaseConnectionString --command="drop database {{ databaseName }} with (force);"
+      psql $DatabaseConnectionString --command="drop user {{ username }};"
+
+      aws ssm delete-parameter --name "{{ connectionStringParameterStoreName }}"
 DOC
 }
