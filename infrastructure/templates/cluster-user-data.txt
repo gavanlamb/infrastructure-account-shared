@@ -1,4 +1,5 @@
 #!/bin/bash
 echo ECS_CLUSTER=${cluster_name} >> /etc/ecs/ecs.config
 echo ECS_ENABLE_TASK_IAM_ROLE=true >> /etc/ecs/ecs.config
-#echo ECS_AVAILABLE_LOGGING_DRIVERS=["awslogs"] >> /etc/ecs/ecs.config
+
+sudo yum install -y postgresql-libs.x86_64 postgresql.x86_64 jq unzip aws-cli 
