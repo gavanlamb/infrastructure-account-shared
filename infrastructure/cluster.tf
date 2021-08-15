@@ -193,6 +193,15 @@ resource "aws_iam_role_policy_attachment" "linux_ssm_core" {
 resource "aws_iam_service_linked_role" "ecs" {
   aws_service_name = "ecs.amazonaws.com"
 }
+resource "aws_iam_role_policy_attachment" "secrets" {
+  role = aws_iam_role.linux.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
+resource "aws_iam_role_policy_attachment" "ssm_parameters" {
+  role = aws_iam_role.linux.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
+}
+
 
 // Reusable
 resource "aws_placement_group" "default" {
