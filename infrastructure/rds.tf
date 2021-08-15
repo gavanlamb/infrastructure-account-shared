@@ -139,23 +139,23 @@ resource "aws_ssm_document" "create_database" {
   content = <<DOC
 ---
 schemaVersion: '2.2'
-description: aws:runPowerShellScript
+description: aws:runShellScript
 parameters:
   databaseName:
     type: String
     description: "(Required) Database name."
-    allowedPattern: "^([A-Z][a-zA-Z]+)+$"
+    allowedPattern: "^([a-zA-Z0-9_]+)+$"
   username:
     type: String
     description: "(Required) Name of user"
-    allowedPattern: "^([A-Z][a-zA-Z0-9]+)+$"
+    allowedPattern: "^([a-zA-Z0-9_]+)+$"
   connectionStringParameterStoreName:
     type: String
     description: "(Required) Name of the connection string in parameter store"
-    allowedPattern: "^([A-Z][a-zA-Z]+)+$"
+    allowedPattern: "^([a-zA-Z0-9_/]+)+$"
 mainSteps:
-- action: aws:runPowerShellScript
-  name: runPowerShellScript
+- action: aws:runShellScript
+  name: runShellScript
   inputs:
     timeoutSeconds: '300'
     runCommand:
@@ -167,23 +167,28 @@ mainSteps:
 
       DatabaseConnectionString="postgresql://$Username:$Password@$Host:$Port/"
 
-      psql $DatabaseConnectionString -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = '{{ databaseName }}'" | grep -q 1 | exit 0
+      Value=$(psql $DatabaseConnectionString -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = '{{ databaseName }}'")
       
-      UserPassword=$(tr -dc 'A-Za-z0-9!"#' </dev/urandom | head -c 15)
-      UserPassword=$UserPassword'88##'
-
-      psql $DatabaseConnectionString --command="create database {{ databaseName }};"
-      psql $DatabaseConnectionString --command="create user {{ username }} with encrypted password '$UserPassword';"
-      psql $DatabaseConnectionString --command="grant all privileges on database {{ username }} to {{ databaseName }};"
-
-      $ConnectionString="Host=$Host;Port=$Port;Database={{ databaseName }};Username={{ username }};Password=$UserPassword"
-
-      aws ssm put-parameter --name "{{ connectionStringParameterStoreName }}" --value "$ConnectionString" --type "SecureString"
+      if [ $Value = 1 ]
+      then
+        echo "Database already exists"
+      else
+        UserPassword=$(tr -dc 'A-Za-z0-9!"#' </dev/urandom | head -c 15)
+        UserPassword=$UserPassword'88##'
+  
+        psql $DatabaseConnectionString --command="create database {{ databaseName }};"
+        psql $DatabaseConnectionString --command="create user {{ username }} with encrypted password '$UserPassword';"
+        psql $DatabaseConnectionString --command="grant all privileges on database {{ username }} to {{ databaseName }};"
+  
+        ConnectionString="Host=$Host;Port=$Port;Database={{ databaseName }};Username={{ username }};Password=$UserPassword"
+  
+        aws ssm put-parameter --name "{{ connectionStringParameterStoreName }}" --value "$ConnectionString" --type "SecureString"
+      fi
 DOC
 }
 
-resource "aws_ssm_document" "delete_database" {
-  name = "DeleteDatabase-${var.postgres_name}"
+resource "aws_ssm_document" "drop_database" {
+  name = "DropDatabase-${var.postgres_name}"
   document_type = "Command"
 
   document_format = "YAML"
@@ -193,23 +198,23 @@ resource "aws_ssm_document" "delete_database" {
   content = <<DOC
 ---
 schemaVersion: '2.2'
-description: aws:runPowerShellScript
+description: aws:runShellScript
 parameters:
   databaseName:
     type: String
     description: "(Required) Database name."
-    allowedPattern: "^([A-Z][a-zA-Z]+)+$"
+    allowedPattern: "^([a-zA-Z0-9_]+)+$"
   username:
     type: String
     description: "(Required) Name of user"
-    allowedPattern: "^([A-Z][a-zA-Z0-9]+)+$"
+    allowedPattern: "^([a-zA-Z0-9_]+)+$"
   connectionStringParameterStoreName:
     type: String
     description: "(Required) Name of the connection string in parameter store"
-    allowedPattern: "^([A-Z][a-zA-Z]+)+$"
+    allowedPattern: "^([a-zA-Z0-9_/]+)+$"
 mainSteps:
-- action: aws:runPowerShellScript
-  name: runPowerShellScript
+- action: aws:runShellScript
+  name: runShellScript
   inputs:
     timeoutSeconds: '300'
     runCommand:
@@ -221,11 +226,17 @@ mainSteps:
 
       DatabaseConnectionString="postgresql://$Username:$Password@$Host:$Port/"
 
-      psql $DatabaseConnectionString -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = '{{ databaseName }}'" | grep -q 0 | exit 0
+      Value=$(psql $DatabaseConnectionString -U postgres -qtc "SELECT 1 FROM pg_database WHERE datname = '{{ databaseName }}'")
+      echo $Value
+      
+      if [ $Value = 1 ]
+      then
+        psql $DatabaseConnectionString --command="drop database {{ databaseName }} with (force);"
+        psql $DatabaseConnectionString --command="drop user {{ username }};"
 
-      psql $DatabaseConnectionString --command="drop database {{ databaseName }} with (force);"
-      psql $DatabaseConnectionString --command="drop user {{ username }};"
-
-      aws ssm delete-parameter --name "{{ connectionStringParameterStoreName }}"
+        aws ssm delete-parameter --name "{{ connectionStringParameterStoreName }}"
+      else
+        echo "Database doesn't exist"
+      fi
 DOC
 }
