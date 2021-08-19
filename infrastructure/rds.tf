@@ -46,17 +46,17 @@ resource "aws_rds_cluster_parameter_group" "example_postgresql" {
 
 resource "aws_secretsmanager_secret" "postgres_admin_password" {
   name = "Expensely/DatabaseInstance/Postgres/User/Expensely"
-  description = "Admin password for RDS instance:${module.postgres.db_instance_id}"
+  description = "Admin password for RDS instance:${module.postgres.rds_cluster_id}"
 
   tags = local.default_tags
 }
 resource "aws_secretsmanager_secret_version" "postgres_admin_password" {
   secret_id = aws_secretsmanager_secret.postgres_admin_password.id
   secret_string = jsonencode({
-    Username = module.postgres.db_instance_username,
-    Password = module.postgres.db_instance_password,
-    Port = module.postgres.db_instance_port,
-    Endpoint = replace(module.postgres.db_instance_endpoint, ":${module.postgres.db_instance_port}", "")
+    Username = module.postgres.rds_cluster_master_username,
+    Password = module.postgres.rds_cluster_master_password,
+    Port = module.postgres.rds_cluster_port,
+    Endpoint = replace(module.postgres.rds_cluster_endpoint, ":${module.postgres.rds_cluster_port}", "")
   })
 }
 
@@ -77,11 +77,11 @@ resource "aws_security_group_rule" "postgres_server" {
   security_group_id = aws_security_group.postgres_server.id
 
   type = "ingress"
-  from_port = module.postgres.db_instance_port
-  to_port = module.postgres.db_instance_port
+  from_port = module.postgres.rds_cluster_port
+  to_port = module.postgres.rds_cluster_port
   protocol = "tcp"
   source_security_group_id = aws_security_group.postgres_client.id
-  description = "Allow traffic from ${aws_security_group.postgres_client.name} on port ${module.postgres.db_instance_port}"
+  description = "Allow traffic from ${aws_security_group.postgres_client.name} on port ${module.postgres.rds_cluster_port}"
 }
 
 resource "aws_security_group" "postgres_client" {
@@ -100,11 +100,11 @@ resource "aws_security_group_rule" "postgres_client" {
   security_group_id = aws_security_group.postgres_client.id
 
   type = "egress"
-  from_port = module.postgres.db_instance_port
-  to_port = module.postgres.db_instance_port
+  from_port = module.postgres.rds_cluster_port
+  to_port = module.postgres.rds_cluster_port
   protocol = "tcp"
   source_security_group_id = aws_security_group.postgres_server.id
-  description = "Allow traffic to ${aws_security_group.postgres_server.name} on port ${module.postgres.db_instance_port}"
+  description = "Allow traffic to ${aws_security_group.postgres_server.name} on port ${module.postgres.rds_cluster_port}"
 }
 
 resource "aws_ssm_document" "create_database" {
