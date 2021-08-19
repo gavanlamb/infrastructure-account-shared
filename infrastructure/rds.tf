@@ -1,70 +1,49 @@
 module "postgres" {
-  source = "terraform-aws-modules/rds/aws"
-  create_db_instance = true
-  create_db_option_group = true
-  create_db_parameter_group = false
-  create_db_subnet_group = false
-  create_monitoring_role = true
-  create_random_password = true
+  source = "terraform-aws-modules/rds-aurora/aws/"
+  version = "5.2.0"
 
-  identifier = var.postgres_name
-
-  engine = "postgres"
-  engine_version = "13.3"
-  family = "postgres13"
-
-  major_engine_version = "13"
-
-  instance_class = "db.t3.micro"
-
-  allocated_storage = 20
-  max_allocated_storage = 100
-  storage_type = "gp2"
+  name = var.postgres_name
+  engine = "aurora-postgresql"
+  engine_mode = "serverless"
   storage_encrypted = true
 
-  name = "Expensely"
-  username = "Expensely"
-  port = 5432
+  vpc_id = module.vpc.vpc_id
+  subnets = module.vpc.database_subnets
+  create_security_group = true
+  allowed_cidr_blocks = module.vpc.private_subnets_cidr_blocks
 
-  multi_az = true
-  subnet_ids = module.vpc.database_subnets
-  vpc_security_group_ids = [
-    aws_security_group.postgres_server.id]
+  replica_scale_enabled = false
+  replica_count = 0
 
-  maintenance_window = "Sat:15:01-Sat:16:00"
-  backup_window = "14:00-15:00"
-  enabled_cloudwatch_logs_exports = [
-    "postgresql",
-    "upgrade"]
-
-  backup_retention_period = 0
-  skip_final_snapshot = true
-  deletion_protection = false #TODO later
-
-  performance_insights_enabled = true
-  performance_insights_retention_period = 7
   monitoring_interval = 60
 
-  parameters = [
-    {
-      name = "autovacuum"
-      value = 1
-    },
-    {
-      name = "client_encoding"
-      value = "utf8"
-    }
-  ]
-  db_parameter_group_tags = local.default_tags
+  apply_immediately = true
+  skip_final_snapshot = true
 
-  tags = local.default_tags
+  db_parameter_group_name = aws_db_parameter_group.example_postgresql.id
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.example_postgresql.id
 
-  timeouts = {
-    create = "80m"
-    update = "80m"
-    delete = "80m"
+  scaling_configuration = {
+    auto_pause = true
+    min_capacity = 1
+    max_capacity = 4
+    seconds_until_auto_pause = 300
+    timeout_action = "ForceApplyCapacityChange"
   }
 }
+resource "aws_db_parameter_group" "example_postgresql" {
+  name = "${var.postgres_name}-aurora-db-postgres-parameter-group"
+  family = "aurora-postgresql10"
+  description = "${var.postgres_name}-aurora-db-postgres-parameter-group"
+  tags = local.default_tags
+}
+resource "aws_rds_cluster_parameter_group" "example_postgresql" {
+  name = "${var.postgres_name}-aurora-postgres-cluster-parameter-group"
+  family = "aurora-postgresql10"
+  description = "${var.postgres_name}-aurora-postgres-cluster-parameter-group"
+  tags = local.default_tags
+}
+
 resource "aws_secretsmanager_secret" "postgres_admin_password" {
   name = "Expensely/DatabaseInstance/Postgres/User/Expensely"
   description = "Admin password for RDS instance:${module.postgres.db_instance_id}"
@@ -77,7 +56,7 @@ resource "aws_secretsmanager_secret_version" "postgres_admin_password" {
     Username = module.postgres.db_instance_username,
     Password = module.postgres.db_instance_password,
     Port = module.postgres.db_instance_port,
-    Endpoint = replace(module.postgres.db_instance_endpoint, ":${module.postgres.db_instance_port}", "") 
+    Endpoint = replace(module.postgres.db_instance_endpoint, ":${module.postgres.db_instance_port}", "")
   })
 }
 
@@ -88,10 +67,10 @@ resource "aws_security_group" "postgres_server" {
   vpc_id = module.vpc.vpc_id
 
   tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.postgres_name}-rds-server"
-    }
+  local.default_tags,
+  {
+    Name = "${var.postgres_name}-rds-server"
+  }
   )
 }
 resource "aws_security_group_rule" "postgres_server" {
@@ -111,10 +90,10 @@ resource "aws_security_group" "postgres_client" {
   vpc_id = module.vpc.vpc_id
 
   tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.postgres_name}-rds-client"
-    }
+  local.default_tags,
+  {
+    Name = "${var.postgres_name}-rds-client"
+  }
   )
 }
 resource "aws_security_group_rule" "postgres_client" {
