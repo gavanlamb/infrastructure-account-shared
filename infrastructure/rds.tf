@@ -1,5 +1,5 @@
 module "postgres" {
-  source = "terraform-aws-modules/rds-aurora/aws/"
+  source = "terraform-aws-modules/rds-aurora/aws"
   version = "5.2.0"
 
   name = var.postgres_name
