@@ -141,14 +141,14 @@ mainSteps:
     timeoutSeconds: '300'
     runCommand:
     - |
-      Username=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Username')
-      Password=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Password')
-      Host=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Endpoint')
-      Port=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Port')
+      Username=$(aws secretsmanager get-secret-value --region '${var.region}' --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Username')
+      Password=$(aws secretsmanager get-secret-value --region '${var.region}' --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Password')
+      Host=$(aws secretsmanager get-secret-value --region '${var.region}' --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Endpoint')
+      Port=$(aws secretsmanager get-secret-value --region '${var.region}' --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Port')
 
-      DatabaseConnectionString="postgresql://$Username:$Password@$Host:$Port/"
+      DatabaseConnectionString="postgresql://$Username:$Password@$Host:$Port/postgres"
 
-      Value=$(psql $DatabaseConnectionString -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = '{{ databaseName }}'")
+      Value=$(psql $DatabaseConnectionString -tc "SELECT 1 FROM pg_database WHERE datname = '{{ databaseName }}'")
       
       if [ $Value = 1 ]
       then
@@ -163,7 +163,7 @@ mainSteps:
   
         ConnectionString="Host=$Host;Port=$Port;Database={{ databaseName }};Username={{ username }};Password=$UserPassword"
   
-        aws ssm put-parameter --name "{{ connectionStringParameterStoreName }}" --value "$ConnectionString" --type "SecureString"
+        aws ssm put-parameter --region '${var.region}' --name "{{ connectionStringParameterStoreName }}" --value "$ConnectionString" --type "SecureString"
       fi
 DOC
 }
@@ -200,22 +200,24 @@ mainSteps:
     timeoutSeconds: '300'
     runCommand:
     - |
-      Username=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Username')
-      Password=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Password')
-      Host=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Endpoint')
-      Port=$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Port')
+      Username=$(aws secretsmanager get-secret-value --region '${var.region}' --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Username')
+      Password=$(aws secretsmanager get-secret-value --region '${var.region}' --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Password')
+      Host=$(aws secretsmanager get-secret-value --region '${var.region}' --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Endpoint')
+      Port=$(aws secretsmanager get-secret-value --region '${var.region}' --secret-id ${aws_secretsmanager_secret.postgres_admin_password.id} --query SecretString --output text | jq --raw-output '.Port')
 
-      DatabaseConnectionString="postgresql://$Username:$Password@$Host:$Port/"
+      DatabaseConnectionString="postgresql://$Username:$Password@$Host:$Port/postgres"
 
-      Value=$(psql $DatabaseConnectionString -U postgres -qtc "SELECT 1 FROM pg_database WHERE datname = '{{ databaseName }}'")
+      Value=$(psql $DatabaseConnectionString -qtc "SELECT 1 FROM pg_database WHERE datname = '{{ databaseName }}'")
       echo $Value
       
       if [ $Value = 1 ]
       then
-        psql $DatabaseConnectionString --command="drop database {{ databaseName }} with (force);"
+        psql $DatabaseConnectionString --command="UPDATE pg_database SET datallowconn = 'false' WHERE datname = '{{ databaseName }}';"
+        psql $DatabaseConnectionString --command="SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{{ databaseName }}';"
+        psql $DatabaseConnectionString --command="drop database {{ databaseName }};"
         psql $DatabaseConnectionString --command="drop user {{ username }};"
 
-        aws ssm delete-parameter --name "{{ connectionStringParameterStoreName }}"
+        aws ssm delete-parameter --region '${var.region}' --name "{{ connectionStringParameterStoreName }}"
       else
         echo "Database doesn't exist"
       fi
