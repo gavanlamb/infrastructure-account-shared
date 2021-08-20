@@ -10,7 +10,8 @@ module "postgres" {
   vpc_id = module.vpc.vpc_id
   subnets = module.vpc.database_subnets
   db_subnet_group_name = module.vpc.database_subnet_group_name
-  create_security_group = true
+  create_security_group = false
+  vpc_security_group_ids = [aws_security_group.postgres_server.id]
   allowed_cidr_blocks = module.vpc.private_subnets_cidr_blocks
 
   replica_scale_enabled = false
@@ -62,6 +63,52 @@ resource "aws_secretsmanager_secret_version" "postgres_admin_password" {
 }
 
 // SECURITY GROUP
+resource "aws_security_group" "postgres_server" {
+  name = "${var.postgres_name}-rds-server"
+  description = "Allow traffic into RDS:expensely"
+  vpc_id = module.vpc.vpc_id
+
+  tags = merge(
+  local.default_tags,
+  {
+    Name = "${var.postgres_name}-rds-server"
+  }
+  )
+}
+resource "aws_security_group_rule" "postgres_server" {
+  security_group_id = aws_security_group.postgres_server.id
+
+  type = "ingress"
+  from_port = module.postgres.rds_cluster_port
+  to_port = module.postgres.rds_cluster_port
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.postgres_client.id
+  description = "Allow traffic from ${aws_security_group.postgres_client.name} on port ${module.postgres.rds_cluster_port}"
+}
+
+resource "aws_security_group" "postgres_client" {
+  name = "${var.postgres_name}-rds-client"
+  description = "Allow traffic to RDS:${var.postgres_name}"
+  vpc_id = module.vpc.vpc_id
+
+  tags = merge(
+  local.default_tags,
+  {
+    Name = "${var.postgres_name}-rds-client"
+  }
+  )
+}
+resource "aws_security_group_rule" "postgres_client" {
+  security_group_id = aws_security_group.postgres_client.id
+
+  type = "egress"
+  from_port = module.postgres.rds_cluster_port
+  to_port = module.postgres.rds_cluster_port
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.postgres_server.id
+  description = "Allow traffic to ${aws_security_group.postgres_server.name} on port ${module.postgres.rds_cluster_port}"
+}
+
 resource "aws_ssm_document" "create_database" {
   name = "CreateDatabase-${var.postgres_name}"
   document_type = "Command"
