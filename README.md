@@ -8,18 +8,18 @@ The postgres table will create a default database with a name of `time` and map 
 
 #### Start
 ```bash
-docker compose -f docker-compose.infrastructure.yml up -d
+docker compose -f docker-compose.yml up -d
 ```
 
 #### Down
 ```bash
-docker compose -f docker-compose.infrastructure.yml down
+docker compose -f docker-compose.yml down
 ```
 
 #### Remove
 Run if the containers have stopped
 ```bash
-docker compose -f docker-compose.infrastructure.yml rm
+docker compose -f docker-compose.yml rm
 ```
 
 #### Setup pgadmin
