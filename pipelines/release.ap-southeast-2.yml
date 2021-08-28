@@ -32,7 +32,7 @@ stages:
     jobs:
       - template: templates/release.environment.yml
         parameters:
-          environment: $(environment)
+          environment: ${{ variables.environment }}
           serviceConnectionName: ${{ variables.terraformServiceConnectionName }}
           stateBucketName: $(terraformStateBucketName)
           stateLockTableName: $(terraformStateLockTableName)
