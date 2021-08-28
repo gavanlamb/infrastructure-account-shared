@@ -28,11 +28,11 @@ stages:
   - stage: production
     displayName: Production
     variables:
-      - template: variables/production.ap-southeast-2.yml@expensely-templates
+      - template: variables/$(System.StageName).ap-southeast-2.yml@expensely-templates
     jobs:
       - template: templates/release.environment.yml
         parameters:
-          environment: ${{ variables.environment }}
+          environment: $(System.StageName)
           serviceConnectionName: ${{ variables.terraformServiceConnectionName }}
           stateBucketName: $(terraformStateBucketName)
           stateLockTableName: $(terraformStateLockTableName)
