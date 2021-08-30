@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:13.3-alpine3.14
+    image: postgres:10.14-alpine
     platform: linux
     restart: unless-stopped
     environment:
