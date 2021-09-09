@@ -159,7 +159,7 @@ mainSteps:
   
         psql $DatabaseConnectionString --command="create database {{ databaseName }};"
         psql $DatabaseConnectionString --command="create user {{ username }} with encrypted password '$UserPassword';"
-        psql $DatabaseConnectionString --command="grant all privileges on database {{ username }} to {{ databaseName }};"
+        psql $DatabaseConnectionString --command="grant all privileges on database {{ databaseName }} to {{ username }};"
   
         ConnectionString="Host=$Host;Port=$Port;Database={{ databaseName }};Username={{ username }};Password=$UserPassword"
   
