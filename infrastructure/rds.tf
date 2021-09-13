@@ -161,7 +161,7 @@ mainSteps:
         psql $DatabaseConnectionString --command="create user {{ username }} with encrypted password '$UserPassword';"
         psql $DatabaseConnectionString --command="grant all privileges on database {{ databaseName }} to {{ username }};"
   
-        ConnectionString="Host=$Host;Port=$Port;Database={{ databaseName }};Username={{ username }};Password=$UserPassword"
+        ConnectionString="Host=$Host;Port=$Port;Database={{ databaseName }};Username={{ username }};Password=$UserPassword;Keepalive=300;CommandTimeout=300;Timeout=300"
   
         aws ssm put-parameter --region '${var.region}' --name "{{ connectionStringParameterStoreName }}" --value "$ConnectionString" --type "SecureString"
       fi
