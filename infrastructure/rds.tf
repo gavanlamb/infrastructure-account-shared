@@ -37,20 +37,16 @@ resource "aws_db_parameter_group" "example_postgresql" {
   name = "${var.postgres_name}-aurora-db-postgres-parameter-group"
   family = "aurora-postgresql10"
   description = "${var.postgres_name}-aurora-db-postgres-parameter-group"
-  tags = local.default_tags
 }
 resource "aws_rds_cluster_parameter_group" "example_postgresql" {
   name = "${var.postgres_name}-aurora-postgres-cluster-parameter-group"
   family = "aurora-postgresql10"
   description = "${var.postgres_name}-aurora-postgres-cluster-parameter-group"
-  tags = local.default_tags
 }
 
 resource "aws_secretsmanager_secret" "postgres_admin_password" {
   name = "Expensely/DatabaseInstance/Postgres/User/Expensely"
   description = "Admin password for RDS instance:${module.postgres.rds_cluster_id}"
-
-  tags = local.default_tags
 }
 resource "aws_secretsmanager_secret_version" "postgres_admin_password" {
   secret_id = aws_secretsmanager_secret.postgres_admin_password.id
@@ -68,12 +64,9 @@ resource "aws_security_group" "postgres_server" {
   description = "Allow traffic into RDS:expensely"
   vpc_id = module.vpc.vpc_id
 
-  tags = merge(
-  local.default_tags,
-  {
+  tags = {
     Name = "${var.postgres_name}-rds-server"
   }
-  )
 }
 resource "aws_security_group_rule" "postgres_server" {
   security_group_id = aws_security_group.postgres_server.id
@@ -91,12 +84,9 @@ resource "aws_security_group" "postgres_client" {
   description = "Allow traffic to RDS:${var.postgres_name}"
   vpc_id = module.vpc.vpc_id
 
-  tags = merge(
-  local.default_tags,
-  {
+  tags = {
     Name = "${var.postgres_name}-rds-client"
   }
-  )
 }
 resource "aws_security_group_rule" "postgres_client" {
   security_group_id = aws_security_group.postgres_client.id
@@ -114,8 +104,6 @@ resource "aws_ssm_document" "create_database" {
   document_type = "Command"
 
   document_format = "YAML"
-
-  tags = local.default_tags
 
   content = <<DOC
 ---
@@ -173,8 +161,6 @@ resource "aws_ssm_document" "drop_database" {
   document_type = "Command"
 
   document_format = "YAML"
-
-  tags = local.default_tags
 
   content = <<DOC
 ---

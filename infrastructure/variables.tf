@@ -84,12 +84,3 @@ variable "vpc_database_subnets" {
   description = "The subnet-level CIDR block for a given database subnet."
   type = list(string)
 }
-
-locals {
-  default_tags = {
-    Application = "Expensely"
-    Team = "Expensely Core"
-    ManagedBy = "Terraform"
-    Environment = var.environment
-  }
-}
