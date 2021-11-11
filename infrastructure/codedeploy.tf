@@ -17,8 +17,6 @@ resource "aws_iam_role" "codedeploy_role" {
   ]
 }
 EOF
-
-  tags = local.default_tags
 }
 resource "aws_iam_role_policy_attachment" "codedeploy_role_ecs_policy_attachment" {
   role       = aws_iam_role.codedeploy_role.name
@@ -44,8 +42,6 @@ resource "aws_s3_bucket" "codedeploy_bucket" {
   versioning {
     enabled = true
   }
-
-  tags = local.default_tags
 }
 resource "aws_s3_bucket_public_access_block" "codedeploy_bucket" {
   bucket = aws_s3_bucket.codedeploy_bucket.id

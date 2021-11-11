@@ -15,8 +15,6 @@ module "vpc" {
   enable_nat_gateway = true
   single_nat_gateway = true
 
-  tags = local.default_tags
-
   public_subnet_tags = {
     Tier = "public"
   }
@@ -43,10 +41,7 @@ resource "aws_security_group" "external" {
       "0.0.0.0/0"]
   }
 
-  tags = merge(
-    local.default_tags,
-    {
-      Name = "external"
-    }
-  )
+  tags = {
+    Name = "external"
+  }
 }

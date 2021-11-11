@@ -60,6 +60,15 @@ variable "postgres_name" {
   description = "Name of the postgres instance"
 }
 
+variable "test_results_policy_name" {
+  type = string
+  description = "Name of the policy for uploading object to test results bucket"
+}
+variable "test_results_bucket_name" {
+  type = string
+  description = "Bucket name for tests results artifacts."
+}
+
 variable "vpc_name" {
   description = "The name of the VPC for the given environment and region."
   type = string
@@ -83,13 +92,4 @@ variable "vpc_application_subnets" {
 variable "vpc_database_subnets" {
   description = "The subnet-level CIDR block for a given database subnet."
   type = list(string)
-}
-
-locals {
-  default_tags = {
-    Application = "Expensely"
-    Team = "Expensely Core"
-    ManagedBy = "Terraform"
-    Environment = var.environment
-  }
 }

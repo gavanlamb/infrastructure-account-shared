@@ -9,8 +9,6 @@ resource "aws_lb" "alb" {
     aws_security_group.external.id]
 
   enable_deletion_protection = true
-
-  tags = local.default_tags
 }
 
 resource "aws_security_group" "alb" {
@@ -36,12 +34,9 @@ resource "aws_security_group" "alb" {
       "0.0.0.0/0"]
   }
 
-  tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.alb_name}-sg"
-    }
-  )
+  tags = {
+    Name = "${var.alb_name}-sg"
+  }
 }
 
 resource "aws_alb_listener" "http" {

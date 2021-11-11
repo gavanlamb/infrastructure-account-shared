@@ -13,8 +13,6 @@ resource "aws_ecs_cluster" "linux" {
     name  = "containerInsights"
     value = "enabled"
   }
-
-  tags = local.default_tags
 }
 resource "aws_ecs_capacity_provider" "linux" {
   name = "linux"
@@ -29,7 +27,6 @@ resource "aws_ecs_capacity_provider" "linux" {
       minimum_scaling_step_size = 1
     }
   }
-  tags = local.default_tags
 }
 resource "aws_launch_template" "linux" {
   name = "linux-cluster-node"
@@ -57,12 +54,9 @@ resource "aws_launch_template" "linux" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = merge(
-      local.default_tags,
-      {
-        Name = var.cluster_name
-      }
-    )
+    tags = {
+      Name = var.cluster_name
+    }
   }
 }
 data "template_file" "linux_startup" {
@@ -236,10 +230,7 @@ resource "aws_security_group" "ephemeral_ports" {
       "0.0.0.0/0"]
   }
 
-  tags = merge(
-  local.default_tags,
-  {
+  tags = {
     Name = "expensely-ephemeral-ports"
   }
-  )
 }
