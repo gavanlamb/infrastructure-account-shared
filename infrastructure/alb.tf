@@ -105,15 +105,21 @@ data "aws_acm_certificate" "alb_default" {
   statuses = ["ISSUED"]
 }
 
-data "aws_acm_certificate" "alb" {
-  count = length(var.alb_certificates)
-  
-  domain   = var.alb_certificates[count.index]
-  statuses = ["ISSUED"]
-}
 resource "aws_lb_listener_certificate" "alb" {
   count = length(var.alb_certificates)
 
   listener_arn = aws_alb_listener.https.arn
   certificate_arn = data.aws_acm_certificate.alb[count.index].arn
+}
+resource "aws_lb_listener_certificate" "alb_test" {
+  count = length(var.alb_certificates)
+
+  listener_arn = aws_alb_listener.test.arn
+  certificate_arn = data.aws_acm_certificate.alb[count.index].arn
+}
+data "aws_acm_certificate" "alb" {
+  count = length(var.alb_certificates)
+
+  domain   = var.alb_certificates[count.index]
+  statuses = ["ISSUED"]
 }
