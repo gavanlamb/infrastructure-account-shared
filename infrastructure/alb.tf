@@ -34,6 +34,15 @@ resource "aws_security_group" "alb" {
       "0.0.0.0/0"]
   }
 
+  ingress {
+    description = "TLS from anywhere"
+    from_port = 8443
+    to_port = 8443
+    protocol = "tcp"
+    cidr_blocks = [
+      "0.0.0.0/0"]
+  }
+
   tags = {
     Name = "${var.alb_name}-sg"
   }
