@@ -142,7 +142,7 @@ mainSteps:
       then
         echo "Database already exists"
       else
-        UserPassword=$(tr -dc 'A-Za-z0-9!# </dev/urandom | head -c 15)
+        UserPassword=$(tr -dc 'A-Za-z0-9!#' </dev/urandom | head -c 15)
         UserPassword=$UserPassword'88##'
   
         psql $DatabaseConnectionString --command="create database {{ databaseName }};"
