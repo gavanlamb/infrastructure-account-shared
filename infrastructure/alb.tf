@@ -36,8 +36,8 @@ resource "aws_security_group" "alb" {
 
   ingress {
     description = "TLS from anywhere"
-    from_port = 8443
-    to_port = 8443
+    from_port = 8000
+    to_port = 8000
     protocol = "tcp"
     cidr_blocks = [
       "0.0.0.0/0"]
@@ -83,7 +83,7 @@ resource "aws_alb_listener" "https" {
 }
 resource "aws_alb_listener" "test" {
   load_balancer_arn = aws_lb.alb.id
-  port = 8443
+  port = 8000
   protocol = "HTTPS"
 
   ssl_policy = "ELBSecurityPolicy-2016-08"
