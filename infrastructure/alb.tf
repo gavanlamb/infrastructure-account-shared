@@ -72,6 +72,24 @@ resource "aws_alb_listener" "https" {
     }
   }
 }
+resource "aws_alb_listener" "test" {
+  load_balancer_arn = aws_lb.alb.id
+  port = 8443
+  protocol = "HTTPS"
+
+  ssl_policy = "ELBSecurityPolicy-2016-08"
+  certificate_arn = data.aws_acm_certificate.alb_default.arn
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "No rule found to forward to a target group."
+      status_code = "200"
+    }
+  }
+}
 
 data "aws_acm_certificate" "alb_default" {
   domain   = var.alb_certificates[0]
