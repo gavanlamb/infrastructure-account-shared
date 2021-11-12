@@ -34,6 +34,15 @@ resource "aws_security_group" "alb" {
       "0.0.0.0/0"]
   }
 
+  ingress {
+    description = "TLS from anywhere"
+    from_port = 8443
+    to_port = 8443
+    protocol = "tcp"
+    cidr_blocks = [
+      "0.0.0.0/0"]
+  }
+
   tags = {
     Name = "${var.alb_name}-sg"
   }
@@ -72,21 +81,45 @@ resource "aws_alb_listener" "https" {
     }
   }
 }
+resource "aws_alb_listener" "test" {
+  load_balancer_arn = aws_lb.alb.id
+  port = 8443
+  protocol = "HTTPS"
+
+  ssl_policy = "ELBSecurityPolicy-2016-08"
+  certificate_arn = data.aws_acm_certificate.alb_default.arn
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "No rule found to forward to a target group."
+      status_code = "200"
+    }
+  }
+}
 
 data "aws_acm_certificate" "alb_default" {
   domain   = var.alb_certificates[0]
   statuses = ["ISSUED"]
 }
 
-data "aws_acm_certificate" "alb" {
-  count = length(var.alb_certificates)
-  
-  domain   = var.alb_certificates[count.index]
-  statuses = ["ISSUED"]
-}
 resource "aws_lb_listener_certificate" "alb" {
   count = length(var.alb_certificates)
 
   listener_arn = aws_alb_listener.https.arn
   certificate_arn = data.aws_acm_certificate.alb[count.index].arn
+}
+resource "aws_lb_listener_certificate" "alb_test" {
+  count = length(var.alb_certificates)
+
+  listener_arn = aws_alb_listener.test.arn
+  certificate_arn = data.aws_acm_certificate.alb[count.index].arn
+}
+data "aws_acm_certificate" "alb" {
+  count = length(var.alb_certificates)
+
+  domain   = var.alb_certificates[count.index]
+  statuses = ["ISSUED"]
 }
