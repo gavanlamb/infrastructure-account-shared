@@ -27,8 +27,6 @@ cluster_instance_public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuTD8qcTvusT9
 code_deploy_role_name="expensely-code-deploy"
 code_deploy_bucket_name="expensely-code-deploy-production"
 
-postgres_name="expensely"
-
 test_results_policy_name="expensely-test-results"
 test_results_bucket_name="expensely-test-results-production"
 

@@ -55,11 +55,6 @@ variable "code_deploy_bucket_name" {
   description = "Bucket name for CodeDeploy artifacts."
 }
 
-variable "postgres_name" {
-  type = string
-  description = "Name of the postgres instance"
-}
-
 variable "test_results_policy_name" {
   type = string
   description = "Name of the policy for uploading object to test results bucket"

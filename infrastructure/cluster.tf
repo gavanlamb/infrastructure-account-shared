@@ -41,7 +41,6 @@ resource "aws_launch_template" "linux" {
   
   vpc_security_group_ids = [
     aws_security_group.ephemeral_ports.id,
-    aws_security_group.postgres_client.id,
     aws_security_group.external.id]
   
   iam_instance_profile {
