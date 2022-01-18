@@ -20,13 +20,19 @@ pr:
     include:
       - '*'
 
+variables:
+  - name: WORKSPACE_PREFIX
+    value: expensely-account-shared-infrastructure-
+
 stages:
   - stage: production
     displayName: Production
     variables:
       - template: variables/production.ap-southeast-2.yml@templates
     jobs:
-      - template: templates/release.environment.yml
+      - template: terraform/plan-and-approve.yml@templates
         parameters:
-          environment: ${{variables.ENVIRONMENT}}
-          region: ${{variables.REGION}}
+          artifactName: ${{ variables.TF_ARTIFACT_NAME }}
+          environment: ${{ variables.ENVIRONMENT }}
+          region: ${{ variables.REGION }}
+          workspaceName: ${{ variables.WORKSPACE_PREFIX }}${{ variables.ENVIRONMENT }}
