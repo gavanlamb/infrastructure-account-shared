@@ -4,11 +4,6 @@ resource "aws_ecs_cluster" "linux" {
   capacity_providers = [
     aws_ecs_capacity_provider.linux.name]
 
-  default_capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.linux.name
-    weight = "100"
-  }
-
   setting {
     name  = "containerInsights"
     value = "enabled"
