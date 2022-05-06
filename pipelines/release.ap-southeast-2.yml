@@ -34,5 +34,4 @@ stages:
         parameters:
           artifactName: ${{ variables.TF_ARTIFACT_NAME }}
           environment: ${{ variables.ENVIRONMENT }}
-          region: ${{ variables.REGION }}
           workspaceName: ${{ variables.WORKSPACE_PREFIX }}${{ variables.ENVIRONMENT }}
