@@ -46,7 +46,7 @@ data "aws_iam_policy_document" "test_results_bucket" {
 }
 
 resource "aws_ecr_repository" "lambda_postman" {
-  name = "jmeter-lambda"
+  name = "lambda-postman"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -79,7 +79,7 @@ EOF
 }
 
 resource "aws_ecr_repository" "lambda_jmeter" {
-  name = "jmeter-lambda"
+  name = "lambda-jmeter"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
