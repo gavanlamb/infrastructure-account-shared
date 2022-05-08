@@ -50,6 +50,10 @@ variable "code_deploy_role_name" {
   type = string
   description = "Name of the role for CodeDeploy"
 }
+variable "code_deploy_policy_name" {
+  type = string
+  description = "Name of the policy for CodeDeploy"
+}
 variable "code_deploy_bucket_name" {
   type = string
   description = "Bucket name for CodeDeploy artifacts."

@@ -51,3 +51,25 @@ resource "aws_s3_bucket_public_access_block" "codedeploy_bucket" {
   restrict_public_buckets = true
   ignore_public_acls = true
 }
+resource "aws_iam_policy" "codedeploy_bucket" {
+  name = var.code_deploy_policy_name
+  description = "Policy for uploading object to code deploy results bucket"
+  policy = data.aws_iam_policy_document.codedeploy_bucket.json
+}
+data "aws_iam_policy_document" "codedeploy_bucket" {
+  statement {
+    sid = "1"
+
+    actions = [
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+    ]
+
+    resources = [
+      aws_s3_bucket.codedeploy_bucket.arn,
+      "${aws_s3_bucket.codedeploy_bucket.arn}/*"
+    ]
+  }
+}
