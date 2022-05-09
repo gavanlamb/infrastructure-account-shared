@@ -59,10 +59,6 @@ variable "code_deploy_bucket_name" {
   description = "Bucket name for CodeDeploy artifacts."
 }
 
-variable "test_results_policy_name" {
-  type = string
-  description = "Name of the policy for uploading object to test results bucket"
-}
 variable "test_results_bucket_name" {
   type = string
   description = "Bucket name for tests results artifacts."

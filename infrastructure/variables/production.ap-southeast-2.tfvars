@@ -28,7 +28,6 @@ code_deploy_role_name="expensely-code-deploy"
 code_deploy_policy_name="expensely-code-deploy"
 code_deploy_bucket_name="expensely-code-deploy-production"
 
-test_results_policy_name="expensely-test-results"
 test_results_bucket_name="expensely-test-results-production"
 
 vpc_name="expensely"
