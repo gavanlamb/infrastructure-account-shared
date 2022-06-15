@@ -28,11 +28,11 @@ data "aws_iam_policy_document" "cloudwatch" {
   statement {
     effect = "Allow"
     actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
+      "kms:Encrypt*",
+      "kms:Decrypt*",
       "kms:ReEncrypt*",
       "kms:GenerateDataKey*",
-      "kms:DescribeKey"
+      "kms:Describe*"
     ]
     resources = [
       "*"
@@ -53,6 +53,30 @@ data "aws_iam_policy_document" "cloudwatch" {
       variable = "kms:CallerAccount"
       values   = [
         data.aws_caller_identity.current.account_id
+      ]
+    }
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
+    ]
+    resources = [
+      "*"
+    ]
+    principals {
+      type = "AWS"
+      identifiers = ["*"]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "kms:EncryptionContext:aws:logs:arn"
+      values   = [
+        "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:loggroup:*"
       ]
     }
   }
