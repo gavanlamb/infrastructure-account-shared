@@ -64,9 +64,9 @@ resource "aws_autoscaling_group" "linux" {
 
   protect_from_scale_in = true
 
-  min_size = 2
-  max_size = 2
-  desired_capacity = 2
+  min_size = 1
+  max_size = 1
+  desired_capacity = 1
   default_cooldown = 100
 
   launch_template {
