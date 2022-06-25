@@ -22,7 +22,7 @@ pr:
 
 variables:
   - name: WORKSPACE_PREFIX
-    value: expensely-account-shared-infrastructure-
+    value: expensely-infrastructure-account-shared-
 
 stages:
   - stage: production
