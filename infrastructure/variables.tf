@@ -16,23 +16,6 @@ variable "alb_certificates" {
   description = "Name certificates to add to the ALB"
 }
 
-#variable "bastion_name" {
-#  type = string
-#  description = "Bastion name"
-#}
-#variable "bastion_bucket_name" {
-#  type = string
-#  description = "Name of the bucket for the bastion service"
-#}
-#variable "bastion_instance_size" {
-#  type = string
-#  description = "Instance size of the bastion host"
-#}
-#variable "bastion_public_key" {
-#  type = string
-#  description = "Public key for the bastion host."
-#}
-
 variable "cluster_name" {
   type = string
   description = "Name of the ECS cluster"
