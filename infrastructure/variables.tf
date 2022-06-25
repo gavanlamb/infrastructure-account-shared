@@ -59,11 +59,6 @@ variable "code_deploy_bucket_name" {
   description = "Bucket name for CodeDeploy artifacts."
 }
 
-variable "test_results_bucket_name" {
-  type = string
-  description = "Bucket name for tests results artifacts."
-}
-
 variable "vpc_name" {
   description = "The name of the VPC for the given environment and region."
   type = string

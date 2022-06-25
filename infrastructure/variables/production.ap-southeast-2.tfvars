@@ -23,8 +23,6 @@ code_deploy_role_name="expensely-code-deploy"
 code_deploy_policy_name="expensely-code-deploy"
 code_deploy_bucket_name="expensely-code-deploy-production"
 
-test_results_bucket_name="expensely-test-results-production"
-
 vpc_name="expensely"
 vpc_cidr="10.12.128.0/17"
 vpc_azs=["ap-southeast-2a", "ap-southeast-2b", "ap-southeast-2c"]
