@@ -29,19 +29,6 @@ variable "cluster_instance_public_key" {
   description = "Name of the ECS cluster"
 }
 
-variable "code_deploy_role_name" {
-  type = string
-  description = "Name of the role for CodeDeploy"
-}
-variable "code_deploy_policy_name" {
-  type = string
-  description = "Name of the policy for CodeDeploy"
-}
-variable "code_deploy_bucket_name" {
-  type = string
-  description = "Bucket name for CodeDeploy artifacts."
-}
-
 variable "vpc_name" {
   description = "The name of the VPC for the given environment and region."
   type = string
